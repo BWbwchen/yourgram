@@ -1,4 +1,4 @@
-package authentication
+package authentication_transport
 
 import (
 	"context"

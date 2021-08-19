@@ -1,4 +1,4 @@
-package authentication
+package authentication_endpoint
 
 import (
 	"context"
