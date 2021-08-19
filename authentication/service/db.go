@@ -70,18 +70,33 @@ func connectDB() *mongo.Client {
 func (dbs DBStruct) UserLogin(user UserInfo) string {
 	Logger.Log("status", "user login")
 	if dbs.tryLogin(user) {
+		user = dbs.getUserInfo(user)
 		return generateJWTToken(user)
 	} else {
 		return ""
 	}
 }
 
+func (dbs DBStruct) getUserInfo(user UserInfo) UserInfo {
+	var result UserInfo
+	err := dbs.Collection.FindOne(context.TODO(), bson.M{
+		"$or": []interface{}{
+			bson.M{"email": user.Email, "password": user.Password},
+			bson.M{"name": user.Name, "password": user.Password},
+		},
+	}).Decode(&result)
+
+	Logger.Log("GetUserInfo", err == nil)
+	return result
+}
+
 func (dbs DBStruct) tryLogin(user UserInfo) bool {
 	var result UserInfo
 	err := dbs.Collection.FindOne(context.TODO(), bson.M{
-		"email":    user.Email,
-		"name":     user.Name,
-		"password": user.Password,
+		"$or": []interface{}{
+			bson.M{"email": user.Email, "password": user.Password},
+			bson.M{"name": user.Name, "password": user.Password},
+		},
 	}).Decode(&result)
 
 	Logger.Log("try login", err == nil)

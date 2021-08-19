@@ -5,6 +5,7 @@ services:
       image: bwbwchen/yourgram_test
       environment:
         DB_URL: db:27017
+        SECRETKEY: bwbwchen
         PORT: 8080
       depends_on:
         - db
