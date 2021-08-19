@@ -14,6 +14,6 @@ stages:          # List of stages for jobs, and their order of execution
 test-job:
   stage: test
   before_script:
-    - apk add docker-compose
+    - apk add docker-compose make
   script:
     - make test
