@@ -33,6 +33,7 @@ type GateWayStruct struct {
 
 func NewService() GateWayStruct {
 	config := api.DefaultConfig()
+	config.Address = os.Getenv("consul_url")
 	api_client, _ := api.NewClient(config)
 	ret := GateWayStruct{
 		serviceName: "None",

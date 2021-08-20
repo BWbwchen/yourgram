@@ -14,6 +14,7 @@ import (
 func registerService() {
 	// register the service to consul
 	config := api.DefaultConfig()
+	config.Address = os.Getenv("consul_url")
 
 	reg := api.AgentServiceRegistration{}
 	reg.Name = "jwt_service"
@@ -24,7 +25,7 @@ func registerService() {
 
 	check := api.AgentServiceCheck{}
 	check.Interval = "10s"
-	check.HTTP = "http://" + os.Getenv("IP") + ":" + strconv.Itoa(reg.Port) + "/health"
+	check.HTTP = "http://" + os.Getenv("localIP") + ":" + strconv.Itoa(reg.Port) + "/health"
 
 	reg.Check = &check
 

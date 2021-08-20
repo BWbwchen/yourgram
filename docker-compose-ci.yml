@@ -6,9 +6,8 @@ services:
         context : .
         target: deploy 
       environment:
-        localIP: jwt_service
+        IP: jwt_service
         PORT: 8080
-        consul_url: consul:8500
       ports:
         - 8080:8080
       depends_on:
@@ -23,12 +22,11 @@ services:
       #image: bwbwchen/yourgram_test
       build :
         context : ./account
-        target: deploy 
+        target: build 
       environment:
         DB_URL: db:27017
         SECRETKEY: bwbwchen
-        localIP: account_service
-        consul_url: consul:8500
+        IP: jwt_service
         PORT: 12000
       expose :
         - 12000
@@ -40,12 +38,11 @@ services:
       container_name: jwt_service
       build :
         context : ./jwt
-        target: deploy 
+        target: build 
       environment:
         SECRETKEY: bwbwchen
-        localIP: jwt_service
+        IP: jwt_service
         PORT: 12100
-        consul_url: consul:8500
       expose :
         - 12100
       depends_on:
@@ -54,7 +51,7 @@ services:
 
     consul :
       container_name : consul
-      image: bitnami/consul
+      image: consul:latest
       expose:
         - "8500"
       ports:
