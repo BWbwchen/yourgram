@@ -1,4 +1,4 @@
-package authentication_service
+package main
 
 type AuthRequest struct {
 	Email    string `json:"email"`

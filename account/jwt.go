@@ -1,4 +1,4 @@
-package authentication_service
+package main
 
 import (
 	"os"
@@ -7,7 +7,7 @@ import (
 )
 
 type MyCustomClaims struct {
-	Email string `json:"email"`
+	Email string `json:"userdata"`
 	jwt.StandardClaims
 }
 
@@ -19,7 +19,7 @@ func generateJWTToken(user UserInfo) string {
 	claims := MyCustomClaims{
 		user.Email,
 		jwt.StandardClaims{
-			ExpiresAt: 2592000, // 1 month
+			ExpiresAt: 0, // no expire time for dev
 			Issuer:    "BWbwchen",
 		},
 	}

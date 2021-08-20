@@ -1,4 +1,4 @@
-package authentication_service
+package main
 
 import (
 	"context"

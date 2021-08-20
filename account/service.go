@@ -1,7 +1,8 @@
-package authentication_service
+package main
 
 import (
 	"context"
+	"net/http"
 )
 
 type AuthService interface {
@@ -19,12 +20,12 @@ func (aw AuthenticateWorker) CreateAccount(ctx context.Context,
 	request AuthRequest) AuthResponse {
 	if db.CreateUser(UserInfo(request)) {
 		return AuthResponse{
-			StatusCode: 200,
+			StatusCode: http.StatusOK,
 			JWTToken:   "",
 		}
 	} else {
 		return AuthResponse{
-			StatusCode: 400,
+			StatusCode: http.StatusBadRequest,
 			JWTToken:   "",
 		}
 	}
@@ -35,12 +36,12 @@ func (aw AuthenticateWorker) UserLogin(ctx context.Context,
 	JWTToken := db.UserLogin(UserInfo(request))
 	if JWTToken != "" {
 		return AuthResponse{
-			StatusCode: 200,
+			StatusCode: http.StatusOK,
 			JWTToken:   JWTToken,
 		}
 	} else {
 		return AuthResponse{
-			StatusCode: 401,
+			StatusCode: http.StatusUnauthorized,
 			JWTToken:   JWTToken,
 		}
 	}

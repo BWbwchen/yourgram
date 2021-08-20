@@ -1,7 +1,12 @@
 test :
-	docker build --file Dockerfile-ci --tag bwbwchen/yourgram_test .
-	-docker-compose --file docker-compose-ci.yml up --abort-on-container-exit --exit-code-from server
-	docker-compose --file docker-compose-ci.yml down
+#	docker build --file Dockerfile-ci --tag bwbwchen/yourgram_test .
+	-docker-compose up --build --abort-on-container-exit account_service 
+	docker-compose down
+	-docker-compose up --build --abort-on-container-exit jwt_service 
+	docker-compose down
 
-service_test:
-	go test -v yourgram/authentication/service
+account_test:
+	go test -v .
+
+jwt_test:
+	go test -v .
