@@ -11,9 +11,16 @@
 stages:          # List of stages for jobs, and their order of execution
   - test
 
-test-job:
+account-test:
   stage: test
   before_script:
     - apk add docker-compose make
   script:
-    - make test
+    - make account_test
+
+jwt-test:
+  stage: test
+  before_script:
+    - apk add docker-compose make
+  script:
+    - make jwt_test
