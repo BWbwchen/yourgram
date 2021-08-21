@@ -64,7 +64,6 @@ func (s JWTService) encodeRequest(ctx context.Context, request *http.Request, in
 	body, _ := json.Marshal(in)
 	newRequest, _ := http.NewRequest(request.Method, "", bytes.NewBuffer(body))
 	request.Body = newRequest.Body
-	request = newRequest
 	return nil
 }
 

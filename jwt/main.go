@@ -19,7 +19,7 @@ func registerService() {
 	reg := api.AgentServiceRegistration{}
 	reg.Name = "jwt_service"
 	reg.ID = reg.Name + uuid.New().String()
-	reg.Address = os.Getenv("IP")
+	reg.Address = os.Getenv("localIP")
 	reg.Port, _ = strconv.Atoi(os.Getenv("PORT"))
 	reg.Tags = []string{"primary"}
 

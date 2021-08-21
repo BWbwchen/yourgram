@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -47,7 +46,6 @@ func NewService() GateWayStruct {
 func (gw GateWayStruct) GetEndpoint(c *gin.Context, enc httptransport.EncodeRequestFunc, dec httptransport.DecodeResponseFunc) endpoint.Endpoint {
 	// get service instance
 	instancer := consul.NewInstancer(gw.client, gw.logger, gw.serviceName, gw.tags, true)
-	fmt.Println(gw.serviceName)
 
 	relativePathSlice := strings.Split(c.Request.URL.Path, "/")
 	relativePath := relativePathSlice[len(relativePathSlice)-1]

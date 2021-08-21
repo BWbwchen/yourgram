@@ -47,7 +47,6 @@ func AccountGateway(r *gin.Engine) *gin.Engine {
 }
 
 func (s accountService) proxy(c *gin.Context) {
-	fmt.Println(c.Request)
 	endpoint := s.GetEndpoint(c, s.encodeRequest, s.decodeResponse)
 
 	var request AuthRequest
@@ -65,7 +64,6 @@ func (s accountService) encodeRequest(ctx context.Context, request *http.Request
 	body, _ := json.Marshal(in)
 	newRequest, _ := http.NewRequest(request.Method, "", bytes.NewBuffer(body))
 	request.Body = newRequest.Body
-	request = newRequest
 	return nil
 }
 
