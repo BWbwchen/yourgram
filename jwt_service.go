@@ -57,6 +57,7 @@ func (s JWTService) proxy(c *gin.Context) {
 	resp := response.(AuthorizationResponse)
 	w := c.Writer
 	w.WriteHeader(resp.StatusCode)
+	w.Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(w)
 	encoder.Encode(resp)
 }

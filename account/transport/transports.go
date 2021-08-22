@@ -18,6 +18,7 @@ func DecodeRequest(ctx context.Context, req *http.Request) (interface{}, error) 
 func EncodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
 	resp := response.(account_svc.AuthResponse)
 	w.WriteHeader(resp.StatusCode)
+	w.Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(w)
 	encoder.Encode(resp)
 	return nil
