@@ -1,28 +1,33 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 
 	account_endp "yourgram/account/endpoint"
 	account_svc "yourgram/account/service"
 	account_trans "yourgram/account/transport"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/sd/consul"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/google/uuid"
 	"github.com/hashicorp/consul/api"
 )
 
-func registerService() {
+func registerService() *consul.Registrar {
 	// register the service to consul
 	config := api.DefaultConfig()
 	config.Address = os.Getenv("consul_url")
 
 	reg := api.AgentServiceRegistration{}
 	reg.Name = "account_service"
-	reg.ID = reg.Name + uuid.NewString()
+	reg.ID = reg.Name + uuid.New().String()
 	reg.Address = os.Getenv("localIP")
 	reg.Port, _ = strconv.Atoi(os.Getenv("PORT"))
 	reg.Tags = []string{"primary"}
@@ -37,8 +42,9 @@ func registerService() {
 	if err != nil {
 		panic(err)
 	}
+	consulClient := consul.NewClient(client)
 
-	client.Agent().ServiceRegister(&reg)
+	return consul.NewRegistrar(consulClient, &reg, log.NewLogfmtLogger(os.Stdout))
 }
 
 func CreateAccountHandler() *httptransport.Server {
@@ -75,6 +81,22 @@ func main() {
 		})
 	})
 
-	registerService()
-	r.Run()
+	registar := registerService()
+	registar.Register()
+
+	errc := make(chan error)
+	go func() {
+		registar.Register()
+		errc <- r.Run()
+	}()
+
+	go func() {
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+		errc <- fmt.Errorf("%s", <-c)
+	}()
+
+	<-errc
+	registar.Deregister()
+
 }

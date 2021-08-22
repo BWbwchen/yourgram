@@ -7,14 +7,12 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
-
-	jwt_endp "yourgram/jwt/endpoint"
-	jwt_svc "yourgram/jwt/service"
-	jwt_trans "yourgram/jwt/transport"
-
-	"github.com/go-kit/kit/log"
+	upload_endp "yourgram/upload/endpoint"
+	upload_svc "yourgram/upload/service"
+	upload_trans "yourgram/upload/transport"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/sd/consul"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/google/uuid"
@@ -27,7 +25,7 @@ func registerService() *consul.Registrar {
 	config.Address = os.Getenv("consul_url")
 
 	reg := api.AgentServiceRegistration{}
-	reg.Name = "jwt_service"
+	reg.Name = "upload_service"
 	reg.ID = reg.Name + uuid.New().String()
 	reg.Address = os.Getenv("localIP")
 	reg.Port, _ = strconv.Atoi(os.Getenv("PORT"))
@@ -48,32 +46,32 @@ func registerService() *consul.Registrar {
 	return consul.NewRegistrar(consulClient, &reg, log.NewLogfmtLogger(os.Stdout))
 }
 
-func CreateJWTHandler() *httptransport.Server {
-	svc := jwt_svc.AuthorizationWorker{}
+func UploadHandler() *httptransport.Server {
+	svc := upload_svc.UploadWorker{}
 	return httptransport.NewServer(
-		jwt_endp.MakeCreateJWTEndPoint(svc),
-		jwt_trans.DecodeRequest,
-		jwt_trans.EncodeResponse,
+		upload_endp.MakeUploadEndPoint(svc),
+		upload_trans.DecodeRequest,
+		upload_trans.EncodeResponse,
 	)
 }
 
-func VerifyJWTHandler() *httptransport.Server {
-	svc := jwt_svc.AuthorizationWorker{}
+func InfoHandler() *httptransport.Server {
+	svc := upload_svc.UploadWorker{}
 	return httptransport.NewServer(
-		jwt_endp.MakeVerifyJWTEndPoint(svc),
-		jwt_trans.DecodeRequest,
-		jwt_trans.EncodeResponse,
+		upload_endp.MakeInfoEndPoint(svc),
+		upload_trans.DecodeRequest,
+		upload_trans.EncodeResponse,
 	)
 }
 
 func main() {
 	r := gin.Default()
 
-	r.POST("/create", func(c *gin.Context) {
-		CreateJWTHandler().ServeHTTP(c.Writer, c.Request)
+	r.POST("/upload", func(c *gin.Context) {
+		UploadHandler().ServeHTTP(c.Writer, c.Request)
 	})
-	r.GET("/auth", func(c *gin.Context) {
-		VerifyJWTHandler().ServeHTTP(c.Writer, c.Request)
+	r.GET("/info", func(c *gin.Context) {
+		InfoHandler().ServeHTTP(c.Writer, c.Request)
 	})
 	r.GET("/health", func(c *gin.Context) {
 		c.Header("Content-Type", "application/json")
