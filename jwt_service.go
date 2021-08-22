@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -62,8 +63,8 @@ func (s JWTService) proxy(c *gin.Context) {
 
 func (s JWTService) encodeRequest(ctx context.Context, request *http.Request, in interface{}) error {
 	body, _ := json.Marshal(in)
-	newRequest, _ := http.NewRequest(request.Method, "", bytes.NewBuffer(body))
-	request.Body = newRequest.Body
+	bodyReader := bytes.NewReader(body)
+	request.Body = io.NopCloser(bodyReader)
 	return nil
 }
 
