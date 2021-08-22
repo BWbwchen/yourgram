@@ -1,4 +1,4 @@
-package main
+package account_svc
 
 import (
 	"context"

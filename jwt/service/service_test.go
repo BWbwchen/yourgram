@@ -1,4 +1,4 @@
-package main
+package jwt_svc
 
 import (
 	"context"

@@ -1,4 +1,4 @@
-package main
+package account_svc
 
 type AuthRequest struct {
 	Email    string `json:"email"`

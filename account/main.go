@@ -5,6 +5,10 @@ import (
 	"os"
 	"strconv"
 
+	account_endp "yourgram/account/endpoint"
+	account_svc "yourgram/account/service"
+	account_trans "yourgram/account/transport"
+
 	"github.com/gin-gonic/gin"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/google/uuid"
@@ -38,20 +42,20 @@ func registerService() {
 }
 
 func CreateAccountHandler() *httptransport.Server {
-	svc := AuthenticateWorker{}
+	svc := account_svc.AuthenticateWorker{}
 	return httptransport.NewServer(
-		MakeCreateAccountEndPoint(svc),
-		DecodeRequest,
-		EncodeResponse,
+		account_endp.MakeCreateAccountEndPoint(svc),
+		account_trans.DecodeRequest,
+		account_trans.EncodeResponse,
 	)
 }
 
 func UserLoginHandler() *httptransport.Server {
-	svc := AuthenticateWorker{}
+	svc := account_svc.AuthenticateWorker{}
 	return httptransport.NewServer(
-		MakeUserLoginEndPoint(svc),
-		DecodeRequest,
-		EncodeResponse,
+		account_endp.MakeUserLoginEndPoint(svc),
+		account_trans.DecodeRequest,
+		account_trans.EncodeResponse,
 	)
 }
 

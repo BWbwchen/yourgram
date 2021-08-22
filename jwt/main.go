@@ -5,6 +5,10 @@ import (
 	"os"
 	"strconv"
 
+	jwt_endp "yourgram/jwt/endpoint"
+	jwt_svc "yourgram/jwt/service"
+	jwt_trans "yourgram/jwt/transport"
+
 	"github.com/gin-gonic/gin"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/google/uuid"
@@ -38,20 +42,20 @@ func registerService() {
 }
 
 func CreateJWTHandler() *httptransport.Server {
-	svc := AuthorizationWorker{}
+	svc := jwt_svc.AuthorizationWorker{}
 	return httptransport.NewServer(
-		MakeCreateJWTEndPoint(svc),
-		DecodeRequest,
-		EncodeResponse,
+		jwt_endp.MakeCreateJWTEndPoint(svc),
+		jwt_trans.DecodeRequest,
+		jwt_trans.EncodeResponse,
 	)
 }
 
 func VerifyJWTHandler() *httptransport.Server {
-	svc := AuthorizationWorker{}
+	svc := jwt_svc.AuthorizationWorker{}
 	return httptransport.NewServer(
-		MakeVerifyJWTEndPoint(svc),
-		DecodeRequest,
-		EncodeResponse,
+		jwt_endp.MakeVerifyJWTEndPoint(svc),
+		jwt_trans.DecodeRequest,
+		jwt_trans.EncodeResponse,
 	)
 }
 
