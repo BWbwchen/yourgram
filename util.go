@@ -13,6 +13,7 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/sd"
 	"github.com/go-kit/kit/sd/consul"
+	"github.com/go-kit/kit/sd/lb"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/hashicorp/consul/api"
 )
@@ -56,7 +57,7 @@ func (gw GateWayStruct) GetEndpoint(c *gin.Context, enc httptransport.EncodeRequ
 	}
 
 	endpointer := sd.NewEndpointer(instancer, factory, gw.logger)
-	endpoints, _ := endpointer.Endpoints()
-	endpoint := endpoints[0]
+	balancer := lb.NewRoundRobin(endpointer)
+	endpoint, _ := balancer.Endpoint()
 	return endpoint
 }
