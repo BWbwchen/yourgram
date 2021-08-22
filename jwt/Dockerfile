@@ -5,7 +5,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 go build -o /jwt 
 
-CMD [ "go", "test", "-v" ]
+CMD [ "go", "test", "-v", "yourgram/jwt/service" ]
 
 FROM alpine:latest AS deploy
 
