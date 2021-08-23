@@ -49,6 +49,22 @@ services:
         - db
         - consul
 
+    upload_service:
+      container_name: upload_service
+      build :
+        context : ./upload
+        target: build 
+      environment:
+        DB_URL: db:27017
+        localIP: upload_service
+        consul_url: consul:8500
+        PORT: 12200
+      expose :
+        - 12200
+      depends_on:
+        - db
+        - consul
+
     consul :
       container_name : consul
       image: consul:latest

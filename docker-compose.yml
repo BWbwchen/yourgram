@@ -15,6 +15,7 @@ services:
         - db
         - account_service
         - jwt_service
+        - upload_service
         - consul
        
 
@@ -48,6 +49,22 @@ services:
         consul_url: consul:8500
       expose :
         - 12100
+      depends_on:
+        - db
+        - consul
+
+    upload_service:
+      container_name: upload_service
+      build :
+        context : ./upload
+        target: deploy 
+      environment:
+        DB_URL: db:27017
+        localIP: upload_service
+        consul_url: consul:8500
+        PORT: 12200
+      expose :
+        - 12200
       depends_on:
         - db
         - consul
