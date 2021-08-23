@@ -63,6 +63,9 @@ services:
         localIP: upload_service
         consul_url: consul:8500
         PORT: 12200
+        minio_url: minio:9001
+        minio_user: miniouser
+        minio_password: minio123
       expose :
         - 12200
       depends_on:
