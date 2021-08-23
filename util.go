@@ -25,10 +25,12 @@ type Service interface {
 }
 
 type GateWayStruct struct {
-	serviceName string
-	tags        []string
-	logger      log.Logger
-	client      consul.Client
+	serviceName     string
+	tags            []string
+	logger          log.Logger
+	client          consul.Client
+	originalRequest *http.Request
+	data            []byte
 }
 
 func NewService() GateWayStruct {
