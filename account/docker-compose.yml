@@ -1,0 +1,33 @@
+version: "3.5"
+services:
+    account_service:
+      container_name: account_service
+      #image: bwbwchen/yourgram_test
+      build :
+        context : .
+        target: build 
+      environment:
+        DB_URL: db:27017
+        SECRETKEY: bwbwchen
+        localIP: account_service
+        consul_url: consul:8500
+        PORT: 12000
+      expose :
+        - 12000
+      depends_on:
+        - db
+        - consul
+
+    consul :
+      container_name : consul
+      image: bitnami/consul
+      expose:
+        - "8500"
+      ports:
+        - 8501:8500
+
+    db:
+      container_name: mongodb
+      image: mongo:4.0.26-xenial
+      expose:
+        - 27017

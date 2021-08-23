@@ -1,0 +1,31 @@
+version: "3.5"
+services:
+    jwt_service:
+      container_name: jwt_service
+      build :
+        context : .
+        target: build 
+      environment:
+        SECRETKEY: bwbwchen
+        localIP: jwt_service
+        PORT: 12100
+        consul_url: consul:8500
+      expose :
+        - 12100
+      depends_on:
+        - db
+        - consul
+
+    consul :
+      container_name : consul
+      image: bitnami/consul
+      expose:
+        - "8500"
+      ports:
+        - 8501:8500
+
+    db:
+      container_name: mongodb
+      image: mongo:4.0.26-xenial
+      expose:
+        - 27017

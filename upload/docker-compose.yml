@@ -1,0 +1,32 @@
+version: "3.5"
+services:
+    upload_service:
+      container_name: upload_service
+      #image: bwbwchen/yourgram_test
+      build :
+        context : .
+        target: build 
+      environment:
+        DB_URL: db:27017
+        localIP: upload_service
+        consul_url: consul:8500
+        PORT: 12200
+      expose :
+        - 12200
+      depends_on:
+        - db
+        - consul
+
+    consul :
+      container_name : consul
+      image: bitnami/consul
+      expose:
+        - "8500"
+      ports:
+        - 8501:8500
+
+    db:
+      container_name: mongodb
+      image: mongo:4.0.26-xenial
+      expose:
+        - 27017
