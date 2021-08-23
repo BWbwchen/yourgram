@@ -24,3 +24,10 @@ jwt-test:
     - apk add docker-compose make
   script:
     - make jwt_test
+
+upload-test:
+  stage: test
+  before_script:
+    - apk add docker-compose make
+  script:
+    - make upload_test
