@@ -25,7 +25,7 @@ type DB interface {
 var db DB
 var Logger log.Logger = init_logger()
 
-func init() {
+func initDB() {
 	client := connectDB()
 	_db := DBStruct{
 		Client:     client,
@@ -77,19 +77,6 @@ func (dbs DBStruct) UserLogin(user UserInfo) string {
 	}
 }
 
-func (dbs DBStruct) getUserInfo(user UserInfo) UserInfo {
-	var result UserInfo
-	err := dbs.Collection.FindOne(context.TODO(), bson.M{
-		"$or": []interface{}{
-			bson.M{"email": user.Email, "password": user.Password},
-			bson.M{"name": user.Name, "password": user.Password},
-		},
-	}).Decode(&result)
-
-	Logger.Log("GetUserInfo", err == nil)
-	return result
-}
-
 func (dbs DBStruct) tryLogin(user UserInfo) bool {
 	var result UserInfo
 	err := dbs.Collection.FindOne(context.TODO(), bson.M{
@@ -101,6 +88,19 @@ func (dbs DBStruct) tryLogin(user UserInfo) bool {
 
 	Logger.Log("try login", err == nil)
 	return err == nil
+}
+
+func (dbs DBStruct) getUserInfo(user UserInfo) UserInfo {
+	var result UserInfo
+	err := dbs.Collection.FindOne(context.TODO(), bson.M{
+		"$or": []interface{}{
+			bson.M{"email": user.Email, "password": user.Password},
+			bson.M{"name": user.Name, "password": user.Password},
+		},
+	}).Decode(&result)
+
+	Logger.Log("GetUserInfo", err == nil)
+	return result
 }
 
 func (dbs DBStruct) CreateUser(user UserInfo) bool {
@@ -123,6 +123,12 @@ func (dbs DBStruct) CreateUser(user UserInfo) bool {
 	return err == nil
 }
 
+func (dbs DBStruct) valid(user UserInfo) bool {
+	return user.Email != "" &&
+		user.Name != "" &&
+		user.Password != ""
+}
+
 func (dbs DBStruct) userExisted(user UserInfo) bool {
 	var result UserInfo
 	err := dbs.Collection.FindOne(context.TODO(), bson.M{
@@ -132,10 +138,4 @@ func (dbs DBStruct) userExisted(user UserInfo) bool {
 		},
 	}).Decode(&result)
 	return err != mongo.ErrNoDocuments
-}
-
-func (dbs DBStruct) valid(user UserInfo) bool {
-	return user.Email != "" &&
-		user.Name != "" &&
-		user.Password != ""
 }

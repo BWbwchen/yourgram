@@ -68,20 +68,6 @@ func getImgInfo(imgID string) (ImgInfo, error) {
 	return db.Query(imgID)
 }
 
-func addPerData() error {
-	return db.(DBStruct).preData()
-}
-
-func (dbs DBStruct) preData() error {
-	predata := ImgInfo{
-		ImgID:  "test",
-		ImgURL: "testURL",
-		User:   "testUser",
-	}
-	_, err := dbs.Collection.InsertOne(context.TODO(), predata)
-	return err
-}
-
 func (dbs DBStruct) Insert(info ImgInfo) error {
 	if !info.Valid() {
 		return errors.New("info not valid")

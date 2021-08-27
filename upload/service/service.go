@@ -16,7 +16,7 @@ func NewService() UploadService {
 	return &UploadWorker{}
 }
 
-func init() {
+func InitService() {
 	initDB()
 	initCloudStorage()
 }
@@ -36,8 +36,7 @@ func (uw UploadWorker) Info(ctx context.Context, request UploadRequest) UploadRe
 }
 
 func (uw UploadWorker) Upload(ctx context.Context, request UploadRequest) UploadResponse {
-	fileType := http.DetectContentType(request.Data)
-	if fileType != "image/jpeg" && fileType != "image/png" {
+	if !checkImageType(request.Data) {
 		return UploadResponse{
 			StatusCode: http.StatusBadRequest,
 			Info:       ImgInfo{},
@@ -59,4 +58,12 @@ func (uw UploadWorker) Upload(ctx context.Context, request UploadRequest) Upload
 		StatusCode: http.StatusOK,
 		Info:       info,
 	}
+}
+
+func checkImageType(data []byte) bool {
+	fileType := http.DetectContentType(data)
+	if fileType != "image/jpeg" && fileType != "image/png" {
+		return false
+	}
+	return true
 }

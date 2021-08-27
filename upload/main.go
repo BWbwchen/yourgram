@@ -65,6 +65,7 @@ func InfoHandler() *httptransport.Server {
 }
 
 func main() {
+	upload_svc.InitService()
 	r := gin.Default()
 
 	r.POST("/upload", func(c *gin.Context) {

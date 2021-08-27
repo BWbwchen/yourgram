@@ -16,6 +16,10 @@ func NewService() AuthService {
 	return &AuthenticateWorker{}
 }
 
+func InitService() {
+	initDB()
+}
+
 func (aw AuthenticateWorker) CreateAccount(ctx context.Context,
 	request AuthRequest) AuthResponse {
 	if db.CreateUser(UserInfo(request)) {

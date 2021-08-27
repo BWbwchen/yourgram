@@ -11,23 +11,9 @@
 stages:          # List of stages for jobs, and their order of execution
   - test
 
-account-test:
+ci-test:
   stage: test
-  before_script:
-    - apk add docker-compose make
+  image: golang:alpine
   script:
-    - make account_test
+    - ./test_script.sh
 
-jwt-test:
-  stage: test
-  before_script:
-    - apk add docker-compose make
-  script:
-    - make jwt_test
-
-upload-test:
-  stage: test
-  before_script:
-    - apk add docker-compose make
-  script:
-    - make upload_test

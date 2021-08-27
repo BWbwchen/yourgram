@@ -66,6 +66,7 @@ func UserLoginHandler() *httptransport.Server {
 }
 
 func main() {
+	account_svc.InitService()
 	r := gin.Default()
 
 	r.POST("/create", func(c *gin.Context) {
