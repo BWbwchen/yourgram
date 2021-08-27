@@ -13,7 +13,7 @@ stages:          # List of stages for jobs, and their order of execution
 
 ci-test:
   stage: test
-  image: golang:alpine
+  image: golang:1.16
   script:
     - ./test_script.sh
 
