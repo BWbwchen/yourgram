@@ -8,18 +8,55 @@ import (
 	"github.com/go-kit/kit/endpoint"
 )
 
-func MakeCreateAccountEndPoint(s account_svc.AuthService) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(account_svc.AuthRequest)
-		res := s.CreateAccount(ctx, req)
-		return res, nil
+type Endpoints struct {
+	CreateAccount endpoint.Endpoint
+	UserLogin     endpoint.Endpoint
+}
+
+type Req struct {
+	Email    string `json:"email"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
+}
+
+type Resp struct {
+	StatusCode int    `json:"status"`
+	JWTToken   string `json:"jwt"`
+}
+
+func MakeEndpoints(s account_svc.Service) Endpoints {
+	return Endpoints{
+		CreateAccount: makeCreateAccountEndpoint(s),
+		UserLogin:     makeUserLoginEndpoint(s),
 	}
 }
 
-func MakeUserLoginEndPoint(s account_svc.AuthService) endpoint.Endpoint {
+func makeCreateAccountEndpoint(s account_svc.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(account_svc.AuthRequest)
-		res := s.UserLogin(ctx, req)
-		return res, nil
+		req := request.(Req)
+		res := s.CreateAccount(ctx, account_svc.Input{
+			Email:    req.Email,
+			Name:     req.Name,
+			Password: req.Password,
+		})
+		return Resp{
+			StatusCode: res.StatusCode,
+			JWTToken:   res.JWTToken,
+		}, nil
+	}
+}
+
+func makeUserLoginEndpoint(s account_svc.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		req := request.(Req)
+		res := s.UserLogin(ctx, account_svc.Input{
+			Email:    req.Email,
+			Name:     req.Name,
+			Password: req.Password,
+		})
+		return Resp{
+			StatusCode: res.StatusCode,
+			JWTToken:   res.JWTToken,
+		}, nil
 	}
 }

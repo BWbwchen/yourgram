@@ -3,48 +3,55 @@ package account_svc
 import (
 	"context"
 	"net/http"
+
+	"github.com/go-kit/log"
 )
 
-type AuthService interface {
-	CreateAccount(ctx context.Context, request AuthRequest) AuthResponse
-	UserLogin(ctx context.Context, request AuthRequest) AuthResponse
+type Service interface {
+	CreateAccount(ctx context.Context, request Input) Output
+	UserLogin(ctx context.Context, request Input) Output
 }
 
-type AuthenticateWorker struct{}
-
-func NewService() AuthService {
-	return &AuthenticateWorker{}
+type Worker struct {
+	logger log.Logger
 }
 
-func InitService() {
+func NewService(logger log.Logger) Service {
+	initService()
+	return &Worker{
+		logger: logger,
+	}
+}
+
+func initService() {
 	initDB()
 }
 
-func (aw AuthenticateWorker) CreateAccount(ctx context.Context,
-	request AuthRequest) AuthResponse {
+func (aw Worker) CreateAccount(ctx context.Context,
+	request Input) Output {
 	if db.CreateUser(UserInfo(request)) {
-		return AuthResponse{
+		return Output{
 			StatusCode: http.StatusOK,
 			JWTToken:   "",
 		}
 	} else {
-		return AuthResponse{
+		return Output{
 			StatusCode: http.StatusBadRequest,
 			JWTToken:   "",
 		}
 	}
 }
 
-func (aw AuthenticateWorker) UserLogin(ctx context.Context,
-	request AuthRequest) AuthResponse {
+func (aw Worker) UserLogin(ctx context.Context,
+	request Input) Output {
 	JWTToken := db.UserLogin(UserInfo(request))
 	if JWTToken != "" {
-		return AuthResponse{
+		return Output{
 			StatusCode: http.StatusOK,
 			JWTToken:   JWTToken,
 		}
 	} else {
-		return AuthResponse{
+		return Output{
 			StatusCode: http.StatusUnauthorized,
 			JWTToken:   JWTToken,
 		}

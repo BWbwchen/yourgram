@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = "./;pb";
+
+service AuthService {
+  rpc CreateAccount(AuthRequest) returns (AuthResponse);
+  rpc UserLogin(AuthRequest) returns (AuthResponse);
+}
+
+message AuthRequest {
+	string Email = 1;
+	string Name = 2;
+	string Password = 3;
+}
+
+message AuthResponse {
+	int32 StatusCode = 1;
+	string JWTToken = 2;
+}
