@@ -2,21 +2,25 @@ package main
 
 import (
 	"fmt"
-	"net/http"
+	"net"
 	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
+	"yourgram/upload/health"
+	"yourgram/upload/pb"
+
 	upload_endp "yourgram/upload/endpoint"
 	upload_svc "yourgram/upload/service"
 	upload_trans "yourgram/upload/transport"
 
-	"github.com/gin-gonic/gin"
 	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 	"github.com/go-kit/kit/sd/consul"
-	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/google/uuid"
 	"github.com/hashicorp/consul/api"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func registerService() *consul.Registrar {
@@ -33,7 +37,7 @@ func registerService() *consul.Registrar {
 
 	check := api.AgentServiceCheck{}
 	check.Interval = "9s"
-	check.HTTP = "http://" + os.Getenv("localIP") + ":" + strconv.Itoa(reg.Port) + "/health"
+	check.GRPC = os.Getenv("localIP") + ":" + strconv.Itoa(reg.Port) + "/Health/Check"
 
 	reg.Check = &check
 
@@ -46,56 +50,43 @@ func registerService() *consul.Registrar {
 	return consul.NewRegistrar(consulClient, &reg, log.NewLogfmtLogger(os.Stdout))
 }
 
-func UploadHandler() *httptransport.Server {
-	svc := upload_svc.UploadWorker{}
-	return httptransport.NewServer(
-		upload_endp.MakeUploadEndPoint(svc),
-		upload_trans.DecodeRequest,
-		upload_trans.EncodeResponse,
-	)
-}
-
-func InfoHandler() *httptransport.Server {
-	svc := upload_svc.UploadWorker{}
-	return httptransport.NewServer(
-		upload_endp.MakeInfoEndPoint(svc),
-		upload_trans.DecodeRequest,
-		upload_trans.EncodeResponse,
-	)
-}
-
 func main() {
-	upload_svc.InitService()
-	r := gin.Default()
+	var logger log.Logger
+	logger = log.NewJSONLogger(os.Stdout)
+	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
+	logger = log.With(logger, "caller", log.DefaultCaller)
 
-	r.POST("/upload", func(c *gin.Context) {
-		UploadHandler().ServeHTTP(c.Writer, c.Request)
-	})
-	r.GET("/info", func(c *gin.Context) {
-		InfoHandler().ServeHTTP(c.Writer, c.Request)
-	})
-	r.GET("/health", func(c *gin.Context) {
-		c.Header("Content-Type", "application/json")
-		c.JSON(http.StatusOK, gin.H{
-			"status": "OK",
-		})
-	})
+	listener, _ := net.Listen("tcp", ":"+os.Getenv("PORT"))
+
+	addservice := upload_svc.NewService(logger)
+	addendpoint := upload_endp.MakeEndpoints(addservice)
+	grpcServer := upload_trans.NewGRPCServer(addendpoint, logger)
+
+	healthService := health.NewService(logger)
 
 	registar := registerService()
-	registar.Register()
 
 	errc := make(chan error)
 	go func() {
+		baseServer := grpc.NewServer()
+		pb.RegisterUploadServiceServer(baseServer, grpcServer)
+		pb.RegisterHealthServer(baseServer, healthService)
+		level.Info(logger).Log("msg", "Server started successfully 🚀")
+
 		registar.Register()
-		errc <- r.Run()
+		reflection.Register(baseServer)
+		baseServer.Serve(listener)
+
+		registar.Register()
 	}()
 
 	go func() {
 		c := make(chan os.Signal, 1)
-		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM, syscall.SIGALRM)
 		errc <- fmt.Errorf("%s", <-c)
 	}()
 
-	<-errc
+	level.Error(logger).Log("exit", <-errc)
 	registar.Deregister()
+
 }

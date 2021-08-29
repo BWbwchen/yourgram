@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option go_package = "./;pb";
+
+service UploadService {
+  rpc Upload(UploadRequest) returns (UploadResponse);
+  rpc Info(UploadRequest) returns (UploadResponse);
+}
+
+message UploadRequest {
+	string UserID = 1;
+	bytes Data = 2;
+	string ImgID = 3;
+}
+
+message ImgInfo {
+	string User = 1;
+	string ImgID = 2;
+	string ImgURL = 3;
+}
+
+message UploadResponse {
+	int32 StatusCode = 1;
+	ImgInfo Info = 2;
+}

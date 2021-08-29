@@ -3,20 +3,27 @@ package upload_svc
 import (
 	"context"
 	"net/http"
+
+	"github.com/go-kit/kit/log"
 )
 
-type UploadService interface {
+type Service interface {
 	Upload(ctx context.Context, request UploadRequest) UploadResponse
 	Info(ctx context.Context, request UploadRequest) UploadResponse
 }
 
-type UploadWorker struct{}
-
-func NewService() UploadService {
-	return &UploadWorker{}
+type UploadWorker struct {
+	log log.Logger
 }
 
-func InitService() {
+func NewService(log log.Logger) Service {
+	initService()
+	return &UploadWorker{
+		log: log,
+	}
+}
+
+func initService() {
 	initDB()
 	initCloudStorage()
 }

@@ -8,7 +8,7 @@ func main() {
 	r := gin.Default()
 
 	r = AccountGateway(r)
-	//	r = UploadGateway(r)
+	r = UploadGateway(r)
 	//	r = JWTGateway(r)
 
 	r.Run()
