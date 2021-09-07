@@ -1,5 +1,0 @@
-FROM golang:1.16
-WORKDIR /app
-COPY . .
-
-CMD [ "make", "service_test" ]

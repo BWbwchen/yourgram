@@ -1,22 +1,22 @@
 version: "3.5"
 services:
-    api_gateway:
-      container_name: api_gateway
-      build :
-        context : .
-        target: deploy 
-      environment:
-        localIP: jwt_service
-        PORT: 8080
-        consul_url: consul:8500
-      ports:
-        - 8080:8080
-      depends_on:
-        - db
-        - account_service
-        - jwt_service
-        - upload_service
-        - consul
+    #api_gateway:
+    #  container_name: api_gateway
+    #  build :
+    #    context : .
+    #    target: deploy 
+    #  environment:
+    #    localIP: jwt_service
+    #    PORT: 8080
+    #    consul_url: consul:8500
+    #  ports:
+    #    - 8080:8080
+    #  depends_on:
+    #    - db
+    #    - account_service
+    #    - jwt_service
+    #    - upload_service
+    #    - consul
        
 
     account_service:
@@ -30,9 +30,9 @@ services:
         SECRETKEY: bwbwchen
         localIP: account_service
         consul_url: consul:8500
-        PORT: 12000
+        PORT: 80
       expose :
-        - 12000
+        - 80
       depends_on:
         - db
         - consul
@@ -45,10 +45,10 @@ services:
       environment:
         SECRETKEY: bwbwchen
         localIP: jwt_service
-        PORT: 12100
+        PORT: 80
         consul_url: consul:8500
       expose :
-        - 12100
+        - 80
       depends_on:
         - db
         - consul
@@ -62,12 +62,12 @@ services:
         DB_URL: db:27017
         localIP: upload_service
         consul_url: consul:8500
-        PORT: 12200
+        PORT: 80
         minio_url: minio:9001
         minio_user: miniouser
         minio_password: minio123
       expose :
-        - 12200
+        - 80
       depends_on:
         - db
         - consul
@@ -77,11 +77,29 @@ services:
       image: bitnami/consul
       expose:
         - "8500"
-      ports:
-        - 8501:8500
+        - "8600"
 
     db:
       container_name: mongodb
       image: mongo:4.0.26-xenial
       expose:
         - 27017
+
+    kong:
+      image: kong:latest
+      volumes: 
+        - ./kong.yml:/usr/local/kong/declarative/kong.yml
+      environment:
+        - KONG_DATABASE=off
+        - KONG_DECLARATIVE_CONFIG=/usr/local/kong/declarative/kong.yml
+        - KONG_PROXY_ACCESS_LOG=/dev/stdout
+        - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+        - KONG_PROXY_ERROR_LOG=/dev/stderr
+        - KONG_ADMIN_ERROR_LOG=/dev/stderr
+        - KONG_ADMIN_LISTEN=0.0.0.0:8001, 0.0.0.0:8444 ssl
+        - KONG_DNS_RESOLVER=consul:8600
+      ports:
+        - "8000:8000"
+        - "8443:8443"
+        - "127.0.0.1:8001:8001"
+        - "127.0.0.1:8444:8444"
