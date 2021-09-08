@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "./;pb";
+
+service ViewImageService {
+  rpc GetImage(ViewImageRequest) returns (ViewImageResponse);
+}
+
+message ViewImageRequest {
+	string UserID = 1;
+}
+
+message ViewImageResponse {
+	repeated string ImgURLs = 1;
+}

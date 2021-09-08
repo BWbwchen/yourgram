@@ -1,0 +1,31 @@
+version: "3.5"
+services:
+    view_image_service:
+      container_name: view_image_service
+      #image: bwbwchen/yourgram_test
+      build :
+        context : .
+        target: build 
+      environment:
+        DB_URL: db:27017
+        localIP: view_image_service
+        consul_url: consul:8500
+        baseurl: s3url
+        PORT: 12300
+      expose :
+        - 12300
+      depends_on:
+        - db
+        - consul
+
+    consul :
+      container_name : consul
+      image: bitnami/consul
+      expose:
+        - "8500"
+
+    db:
+      container_name: mongodb
+      image: mongo:4.0.26-xenial
+      expose:
+        - 27017
