@@ -9,6 +9,7 @@ func main() {
 
 	r = AccountGateway(r)
 	r = UploadGateway(r)
+	r = ViewImageGateway(r)
 	//	r = JWTGateway(r)
 
 	r.Run()
