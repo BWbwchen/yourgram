@@ -13,6 +13,8 @@ stages:          # List of stages for jobs, and their order of execution
 
 ci-test:
   stage: test
+  only:
+    - master
   image: golang:1.16
   script:
     - ./test_script.sh
