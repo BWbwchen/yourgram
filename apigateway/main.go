@@ -7,6 +7,8 @@ import (
 func main() {
 	r := gin.Default()
 
+	r.Use(CORS())
+
 	r = AccountGateway(r)
 	r = UploadGateway(r)
 	r = ViewImageGateway(r)
