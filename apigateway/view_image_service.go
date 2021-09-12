@@ -45,6 +45,7 @@ var nvs Service = NewViewImageService()
 
 func ViewImageGateway(r *gin.Engine) *gin.Engine {
 	service := r.Group("/v1/img")
+	service.Use(JWTAuthMiddleWare())
 	{
 		service.GET("/getImage/:image_owner", nvs.(viewImageService).proxy)
 	}
@@ -85,6 +86,7 @@ func (s viewImageService) proxy(c *gin.Context) {
 	var request viewImageReq
 	json.NewDecoder(c.Request.Body).Decode(&request)
 	request.UserID = c.Param("image_owner")
+	s.logger.Log("Welcome!", c.GetString("user"))
 	response, _ := endpoint(c, request)
 
 	resp := response.(*pb.ViewImageResponse)
