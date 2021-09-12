@@ -46,7 +46,7 @@ var nvs Service = NewViewImageService()
 func ViewImageGateway(r *gin.Engine) *gin.Engine {
 	service := r.Group("/v1/img")
 	{
-		service.GET("/getImage", nvs.(viewImageService).proxy)
+		service.GET("/getImage/:image_owner", nvs.(viewImageService).proxy)
 	}
 	return r
 }
@@ -60,10 +60,6 @@ func (s viewImageService) GetEndpoint(c *gin.Context, enc httptransport.EncodeRe
 	balancer := lb.NewRoundRobin(endpointer)
 	endpoint, _ := balancer.Endpoint()
 
-	/*
-		endpoints, err := endpointer.Endpoints()
-		endpoint := endpoints[0]
-	*/
 	return endpoint
 }
 
@@ -88,6 +84,7 @@ func (s viewImageService) proxy(c *gin.Context) {
 
 	var request viewImageReq
 	json.NewDecoder(c.Request.Body).Decode(&request)
+	request.UserID = c.Param("image_owner")
 	response, _ := endpoint(c, request)
 
 	resp := response.(*pb.ViewImageResponse)

@@ -51,7 +51,7 @@ func AccountGateway(r *gin.Engine) *gin.Engine {
 	service := r.Group("/v1/account")
 	{
 		service.POST("/create", as.(accountService).proxy)
-		service.GET("/auth", as.(accountService).proxy)
+		service.POST("/auth", as.(accountService).proxy)
 	}
 	return r
 }
