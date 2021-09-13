@@ -54,6 +54,7 @@ var us Service = NewUploadService()
 
 func UploadGateway(r *gin.Engine) *gin.Engine {
 	service := r.Group("/v1/img")
+	service.Use(JWTAuthMiddleWare())
 	{
 		service.POST("/upload", us.(UploadService).proxy)
 		service.GET("/info", us.(UploadService).proxy)
@@ -133,7 +134,7 @@ func (s UploadService) proxy(c *gin.Context) {
 	json.NewDecoder(c.Request.Body).Decode(&request)
 	request.Data = s.data
 	// TODO: use JWT token user id
-	request.UserID = "testUser"
+	request.UserID = c.GetString("user")
 
 	response, _ := endpoint(c, request)
 
