@@ -44,7 +44,7 @@ type viewImageResp struct {
 var nvs Service = NewViewImageService()
 
 func ViewImageGateway(r *gin.Engine) *gin.Engine {
-	service := r.Group("/v1/img")
+	service := r.Group("/api/v1/img")
 	service.Use(JWTAuthMiddleWare())
 	{
 		service.GET("/getImage/:image_owner", nvs.(viewImageService).proxy)

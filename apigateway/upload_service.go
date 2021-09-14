@@ -53,7 +53,7 @@ type ImgInfo struct {
 var us Service = NewUploadService()
 
 func UploadGateway(r *gin.Engine) *gin.Engine {
-	service := r.Group("/v1/img")
+	service := r.Group("/api/v1/img")
 	service.Use(JWTAuthMiddleWare())
 	{
 		service.POST("/upload", us.(UploadService).proxy)
