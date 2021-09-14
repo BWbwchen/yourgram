@@ -16,4 +16,6 @@ message AuthRequest {
 message AuthResponse {
 	int32 StatusCode = 1;
 	string JWTToken = 2;
+	string Email = 3;
+	string Name = 4;
 }

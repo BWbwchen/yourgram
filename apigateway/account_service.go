@@ -43,6 +43,8 @@ type AuthRequest struct {
 type AuthResponse struct {
 	StatusCode int    `json:"StatusCode"`
 	JWTToken   string `json:"JWTToken"`
+	Email      string `json:"Email"`
+	Name       string `json:"Name"`
 }
 
 var as Service = NewAccountService()
