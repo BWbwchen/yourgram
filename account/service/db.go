@@ -18,7 +18,7 @@ type DBStruct struct {
 }
 
 type DB interface {
-	UserLogin(UserInfo) string
+	UserLogin(UserInfo) (string, UserInfo)
 	CreateUser(UserInfo) bool
 }
 
@@ -67,13 +67,13 @@ func connectDB() *mongo.Client {
 	return client
 }
 
-func (dbs DBStruct) UserLogin(user UserInfo) string {
+func (dbs DBStruct) UserLogin(user UserInfo) (string, UserInfo) {
 	Logger.Log("status", "user login")
 	if dbs.tryLogin(user) {
 		user = dbs.getUserInfo(user)
-		return generateJWTToken(user)
+		return generateJWTToken(user), user
 	} else {
-		return ""
+		return "", UserInfo{}
 	}
 }
 

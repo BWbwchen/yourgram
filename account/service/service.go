@@ -34,18 +34,22 @@ func (aw Worker) CreateAccount(ctx context.Context,
 		return &pb.AuthResponse{
 			StatusCode: http.StatusOK,
 			JWTToken:   "",
+			Email:      request.Email,
+			Name:       request.Name,
 		}, nil
 	} else {
 		return &pb.AuthResponse{
 			StatusCode: http.StatusBadRequest,
 			JWTToken:   "",
+			Email:      request.Email,
+			Name:       request.Name,
 		}, nil
 	}
 }
 
 func (aw Worker) UserLogin(ctx context.Context,
 	request *pb.AuthRequest) (*pb.AuthResponse, error) {
-	JWTToken := db.UserLogin(UserInfo{
+	JWTToken, userInfo := db.UserLogin(UserInfo{
 		request.Email,
 		request.Name,
 		request.Password,
@@ -54,11 +58,15 @@ func (aw Worker) UserLogin(ctx context.Context,
 		return &pb.AuthResponse{
 			StatusCode: http.StatusOK,
 			JWTToken:   JWTToken,
+			Email:      userInfo.Email,
+			Name:       userInfo.Name,
 		}, nil
 	} else {
 		return &pb.AuthResponse{
 			StatusCode: http.StatusUnauthorized,
 			JWTToken:   JWTToken,
+			Email:      "",
+			Name:       "",
 		}, nil
 	}
 }
