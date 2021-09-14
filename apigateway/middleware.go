@@ -26,7 +26,7 @@ func CORS() gin.HandlerFunc {
 }
 
 type JWTClaim struct {
-	User string `json:"userdata"`
+	UserName string `json:"userdata"`
 	jwt.StandardClaims
 }
 
@@ -80,7 +80,7 @@ func JWTAuthMiddleWare() gin.HandlerFunc {
 		}
 
 		if claims, ok := tokenClaims.Claims.(*JWTClaim); ok {
-			c.Set("user", claims.User)
+			c.Set("user", claims.UserName)
 			c.Next()
 		} else {
 			c.JSON(http.StatusUnauthorized, gin.H{

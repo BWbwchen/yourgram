@@ -7,7 +7,7 @@ import (
 )
 
 type MyCustomClaims struct {
-	Email string `json:"userdata"`
+	UserName string `json:"userdata"`
 	jwt.StandardClaims
 }
 
@@ -17,7 +17,7 @@ func generateJWTToken(user UserInfo) string {
 	// Create a new token object, specifying signing method and the claims
 	// you would like it to contain.
 	claims := MyCustomClaims{
-		user.Email,
+		user.Name,
 		jwt.StandardClaims{
 			ExpiresAt: 0, // no expire time for dev
 			Issuer:    "BWbwchen",
