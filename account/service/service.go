@@ -4,19 +4,16 @@ import (
 	"context"
 	"net/http"
 
+	"yourgram/account/pb"
+
 	"github.com/go-kit/log"
 )
-
-type Service interface {
-	CreateAccount(ctx context.Context, request Input) Output
-	UserLogin(ctx context.Context, request Input) Output
-}
 
 type Worker struct {
 	logger log.Logger
 }
 
-func NewService(logger log.Logger) Service {
+func NewService(logger log.Logger) pb.AuthServiceServer {
 	initService()
 	return &Worker{
 		logger: logger,
@@ -28,32 +25,40 @@ func initService() {
 }
 
 func (aw Worker) CreateAccount(ctx context.Context,
-	request Input) Output {
-	if db.CreateUser(UserInfo(request)) {
-		return Output{
+	request *pb.AuthRequest) (*pb.AuthResponse, error) {
+	if db.CreateUser(UserInfo{
+		request.Email,
+		request.Name,
+		request.Password,
+	}) {
+		return &pb.AuthResponse{
 			StatusCode: http.StatusOK,
 			JWTToken:   "",
-		}
+		}, nil
 	} else {
-		return Output{
+		return &pb.AuthResponse{
 			StatusCode: http.StatusBadRequest,
 			JWTToken:   "",
-		}
+		}, nil
 	}
 }
 
 func (aw Worker) UserLogin(ctx context.Context,
-	request Input) Output {
-	JWTToken := db.UserLogin(UserInfo(request))
+	request *pb.AuthRequest) (*pb.AuthResponse, error) {
+	JWTToken := db.UserLogin(UserInfo{
+		request.Email,
+		request.Name,
+		request.Password,
+	})
 	if JWTToken != "" {
-		return Output{
+		return &pb.AuthResponse{
 			StatusCode: http.StatusOK,
 			JWTToken:   JWTToken,
-		}
+		}, nil
 	} else {
-		return Output{
+		return &pb.AuthResponse{
 			StatusCode: http.StatusUnauthorized,
 			JWTToken:   JWTToken,
-		}
+		}, nil
 	}
 }

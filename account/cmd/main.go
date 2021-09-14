@@ -7,10 +7,8 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
-	account_endpoint "yourgram/account/endpoint"
 	pb "yourgram/account/pb"
 	account_svc "yourgram/account/service"
-	account_trans "yourgram/account/transport"
 
 	"yourgram/account/health"
 
@@ -58,10 +56,7 @@ func main() {
 
 	listener, _ := net.Listen("tcp", ":"+os.Getenv("PORT"))
 
-	addservice := account_svc.NewService(logger)
-	addendpoint := account_endpoint.MakeEndpoints(addservice)
-	grpcServer := account_trans.NewGRPCServer(addendpoint, logger)
-
+	accountService := account_svc.NewService(logger)
 	healthService := health.NewService(logger)
 
 	registar := registerService()
@@ -69,7 +64,7 @@ func main() {
 	errc := make(chan error)
 	go func() {
 		baseServer := grpc.NewServer()
-		pb.RegisterAuthServiceServer(baseServer, grpcServer)
+		pb.RegisterAuthServiceServer(baseServer, accountService)
 		pb.RegisterHealthServer(baseServer, healthService)
 		level.Info(logger).Log("msg", "Server started successfully 🚀")
 
